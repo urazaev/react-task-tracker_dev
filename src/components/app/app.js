@@ -8,7 +8,6 @@ import ItemAddForm from '../item-add-form'
 
 import './app.css'
 
-
 export default class App extends Component {
 
     maxId = 100;
@@ -18,7 +17,9 @@ export default class App extends Component {
             this.createTodoItem('Drink coffee'),
             this.createTodoItem('Make Awesome Ap'),
             this.createTodoItem('Have a lunch')
-        ]
+        ],
+        term: '',
+        filter: 'all' // active, all, done
     };
 
     createTodoItem(label) {
@@ -28,7 +29,7 @@ export default class App extends Component {
             done: false,
             id: this.maxId++
         }
-    }
+    };
 
     deleteItem = (id) => {
         this.setState(({todoData}) => {
@@ -37,17 +38,13 @@ export default class App extends Component {
             const newArray = [
                 ...todoData.slice(0, idx),
                 ...todoData.slice(idx + 1)
-
             ];
 
             return {
                 todoData: newArray
-            }
+            };
         });
-
-        console.log('Delete', id)
     };
-
 
     addItem = (text) => {
         const newItem = this.createTodoItem(text);
@@ -60,8 +57,8 @@ export default class App extends Component {
 
             return {
                 todoData: newArr
-            }
-        })
+            };
+        });
     };
 
     toggleProperty(arr, id, propName) {
@@ -95,9 +92,45 @@ export default class App extends Component {
         })
     };
 
+    onSearchChange = (term) => {
+        this.setState({term})
+    };
+
+    onFilterChange = (filter) => {
+        this.setState({filter})
+    };
+
+    filter(items, filter) {
+        switch (filter) {
+            case 'all':
+                return items;
+            case 'active':
+                return items.filter((item) => !item.done);
+            case 'done':
+                return items.filter((item) => item.done);
+            default :
+                return items;
+        }
+    }
+
+    search(items, term) {
+
+        if (term.length === 0) {
+            return items;
+        }
+        ;
+
+        return items.filter((item) => {
+            return item.label.toLowerCase().indexOf(term.toLowerCase()) > -1
+        });
+    };
+
     render() {
 
-        const {todoData} = this.state;
+        const {todoData, term, filter} = this.state;
+
+        const visibleItems = this.filter(
+            this.search(todoData, term), filter);
 
         const doneCount = todoData
             .filter((el) => el.done).length;
@@ -108,11 +141,13 @@ export default class App extends Component {
             <div className="todo-app">
                 <AppHeader toDo={todoCount} done={doneCount}/>
                 <div className="top-panel d-flex">
-                    <SearchPanel/>
-                    <ItemStatusFilter/>
+                    <SearchPanel onSearchChange={this.onSearchChange}/>
+                    <ItemStatusFilter
+                        filter={filter}
+                        onFilterChange={this.onFilterChange}/>
                 </div>
 
-                <TodoList todos={todoData}
+                <TodoList todos={visibleItems}
                           onDeleted={this.deleteItem}
                           onToggleImportant={this.onToggleImportant}
                           onToggleDone={this.onToggleDone}
@@ -121,6 +156,5 @@ export default class App extends Component {
                 <ItemAddForm onItemAdded={this.addItem}/>
             </div>
         );
-    }
-    ;
-}
+    };
+};
