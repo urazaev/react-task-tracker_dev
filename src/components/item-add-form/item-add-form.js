@@ -4,7 +4,6 @@ import './item-add-form.css'
 
 export default class ItemAddForm extends Component {
 
-
     state = {
         label: '',
     };

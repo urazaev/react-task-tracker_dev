@@ -73,7 +73,6 @@ export default class App extends Component {
             newItem,
             ...arr.slice(idx + 1)
         ];
-
     }
 
     onToggleDone = (id) => {
@@ -118,7 +117,6 @@ export default class App extends Component {
         if (term.length === 0) {
             return items;
         }
-        ;
 
         return items.filter((item) => {
             return item.label.toLowerCase().indexOf(term.toLowerCase()) > -1
@@ -135,7 +133,6 @@ export default class App extends Component {
         const doneCount = todoData
             .filter((el) => el.done).length;
         const todoCount = todoData.length - doneCount;
-
 
         return (
             <div className="todo-app">
